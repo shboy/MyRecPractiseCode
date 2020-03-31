@@ -5,13 +5,12 @@
 
 '''
 import numpy as np
+import math
 
 
 class NaiveBayesian:
     def __init__(self):
         self.data, self.labels = self.load_data()
-
-        pass
 
     def load_data(self):
         data = np.array(
@@ -41,21 +40,42 @@ class NaiveBayesian:
         tmp = data[labels_1_idx]
         average_0 = np.sum(data[labels_0_idx], axis=0) / labels_0_num
         average_1 = np.sum(data[labels_1_idx], axis=0) / labels_1_num
-        sigma_0 = np.sqrt(np.sum((data[labels_0_idx])**2)) / labels_0_num
-        sigma_1 = np.sqrt(np.sum((data[labels_1_idx])**2)) / labels_1_num
-        average = np.sum(data, axis=0) / data_shape[0]
-        sigma = np.sqrt((data - average)**2) / (data_shape[0]-1)
+        sigma_0 = np.sqrt(np.sum((data[labels_0_idx])**2 / labels_0_num, axis=0))
+        sigma_1 = np.sqrt(np.sum((data[labels_1_idx])**2 / labels_1_num, axis=0))
 
+        self.average = average = [average_0, average_1]
+        self.sigma = sigma = [sigma_0, sigma_1]
+        self.labels_0_num = labels_0_num
+        self.labels_1_num = labels_1_num
 
-        # self.sigma = np.
+        return average, sigma
+
 
     def train(self):
+        average, sigma = self.get_feat_charactors()
 
-        pass
+    def predict(self, x):
+        assert x.shape[0] == self.data.shape[1]
 
-    def predict(self):
-        pass
+        p_label_0 = self.labels_0_num / self.data.shape[0]
+        p_label_1 = 1 - p_label_0
+        for i, xi in enumerate(x):
+            #label0
+            part1_label_0 = 1.0 / np.sqrt(2*math.pi*self.sigma[0][i]**2)
+            part1_label_1 = 1.0 / np.sqrt(2*math.pi*self.sigma[1][i]**2)
+
+            p_label_0 *= part1_label_0 * np.exp(-(xi-self.average[0][i])**2/(2*self.sigma[0][i]**2))
+            p_label_1 *= part1_label_1 * np.exp(-(xi-self.average[1][i])**2/(2*self.sigma[1][i]**2))
+
+        if (p_label_0 > p_label_1):
+            return 0
+        else:
+            return 1
 
 if __name__ == '__main__':
     naiveBayesian = NaiveBayesian()
-    naiveBayesian.get_feat_charactors()
+    naiveBayesian.train()
+    x = np.array([134, 84, 235, 349])
+    print(naiveBayesian.predict(x))
+    x = np.array([253, 53, 15, 2243])
+    print(naiveBayesian.predict(x))
