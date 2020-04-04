@@ -29,39 +29,39 @@ print(train_batch_data)
         print(example_data)
 
     def get_cluster_id(self, price, centres):
-        centres_price = centres["price"]
+        centres_price = centres
         idx = np.argmin((centres_price-price)**2)
         return idx
 
     def update_centers(self, clusters: dict, centres: list):
         _centres = []
         for key, points in clusters.items():
-            average = np.average(points["price"])
+            average = np.average(points)
             _centres.append(average)
         centres = _centres
 
 
     def train(self, K=3, steps=10):
         skuid_price_data = self.skuid_price_data
-        centres = skuid_price_data.sample(n=K)["price"]
+        centres = list(skuid_price_data.sample(n=K)["price"].values)
         clusters = dict()
         while steps:
             for idx, row in skuid_price_data.iterrows():
                 skuid = row["skuid"]
                 price = row["price"]
                 cluster_id = self.get_cluster_id(price, centres)
-                clusters.setdefault(clusters, []).append(row)
+                clusters.setdefault(cluster_id, []).append(price)
             self.update_centers(clusters, centres)
 
 
             steps -= 1
 
-        pass
+        return clusters
 
-    def predict(self):
+    def predict(self, clusters: dict):
         pass
 
 if __name__ == '__main__':
     file_path = "data/sku-price/skuid_price.csv"
     kMeans = kMeans(file_path)
-    kMeans.train(K=3, steps=10)
+    clusters: dict = kMeans.train(K=3, steps=10)
