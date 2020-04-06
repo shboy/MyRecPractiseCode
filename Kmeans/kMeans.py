@@ -22,7 +22,7 @@ train_batch_data = csv_batch_data[list(range(3, 6))]  # 取这20条数据的3到
 print(train_batch_data)
 
         """
-        skuid_price_data = pd.read_csv('data/sku-price/skuid_price.csv')
+        skuid_price_data = pd.read_csv('sku-price/skuid_price.csv')
         print("data shape: ", skuid_price_data.shape)
         print("############# data example #############")
         example_data = skuid_price_data.head(5)
@@ -73,7 +73,7 @@ print(train_batch_data)
         pass
 
 if __name__ == '__main__':
-    file_path = "data/sku-price/skuid_price.csv"
+    file_path = "sku-price/skuid_price.csv"
     kMeans = kMeans(file_path)
     clusters: dict = kMeans.train(K=3, steps=10)
     print(clusters)
