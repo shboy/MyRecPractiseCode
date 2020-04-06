@@ -22,11 +22,22 @@ train_batch_data = csv_batch_data[list(range(3, 6))]  # 取这20条数据的3到
 print(train_batch_data)
 
         """
-        self.skuid_price_data = skuid_price_data = pd.read_csv('data/sku-price/skuid_price.csv')
+        skuid_price_data = pd.read_csv('data/sku-price/skuid_price.csv')
         print("data shape: ", skuid_price_data.shape)
         print("############# data example #############")
         example_data = skuid_price_data.head(5)
         print(example_data)
+        print("############# filter 异常值  #############")
+        upper_limit = np.mean(skuid_price_data['price']) + 3*np.std(skuid_price_data['price'])
+        lower_limit = np.mean(skuid_price_data['price']) - 3*np.std(skuid_price_data['price'])
+        # max_idx = upper_limit >= skuid_price_data['price']
+        # min_idx = skuid_price_data['price'] >= lower_limit
+        upper_limit = upper_limit if upper_limit > 5000 else 5000
+        lower_limit = lower_limit if upper_limit > 1 else 1
+        print("upper_limit: {}, lower_limit: {}".format(upper_limit, lower_limit))
+        skuid_price_data = skuid_price_data[(upper_limit >= skuid_price_data['price']) &
+                                            (skuid_price_data['price'] >= lower_limit)]
+        self.skuid_price_data = skuid_price_data
 
     def get_cluster_id(self, price, centres):
         centres_price = centres
@@ -65,3 +76,4 @@ if __name__ == '__main__':
     file_path = "data/sku-price/skuid_price.csv"
     kMeans = kMeans(file_path)
     clusters: dict = kMeans.train(K=3, steps=10)
+    print(clusters)
