@@ -71,7 +71,40 @@ class MyApriori:
 
     #generateRules
     def gen_rules(self, L, support_data):
-        pass
+        rule_result = []
+        # 单元素组成的频繁集((1),(2),(3))，没有生成相关规则
+        for i in range(1, len(L)):
+            # L[i] : ((2, 3), (2,4))
+            # ck: (2, 3)
+            for ck in L[i]:
+                Cks = [frozenset([item]) for item in ck]
+                self.rulesOfMore(ck, Cks, support_data, rule_result)
+        return rule_result
+
+    def rulesOfTwo(self, ck, Cks, support_data, rule_result):
+        prunedH = []
+        for oneCk in Cks:
+            conf = support_data[ck] / support_data[ck - oneCk]
+            if conf >= self.min_confidence:
+                print(ck - oneCk, "-->", oneCk, "Confidence: ", conf)
+                rule_result.append((ck-oneCk, oneCk, conf))
+                prunedH.append(oneCk)
+        return prunedH
+
+    def rulesOfMore(self, ck, Cks, support_data, rule_result):
+        # Cks[0]: (2)
+        # ck: (2, 3)
+        m = len(Cks[0])
+        # Cks中的元素为ck的子集
+        while len(ck) > m:
+            Cks = self.rulesOfTwo(ck, Cks, support_data, rule_result)
+            if len(Cks) > 1:
+                Cks = self.gen_new_Ck(Cks, m+1)
+                m += 1
+            else:
+                break
+
+
 
 
 
