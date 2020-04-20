@@ -1,7 +1,7 @@
 '''
 @Time    : 2020/4/11 21:31
 @Author  : sh_lord
-@FileName: Constants.py
+@FileName: CFConstants.py
 
 '''
 USER_DATA_CSV_PATH = "data/user_data.csv"
