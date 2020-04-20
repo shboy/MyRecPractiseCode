@@ -70,7 +70,9 @@ class UserCFRec:
         # userSimilar矩阵
         print("构造userSimilar矩阵")
         user_sim_dict = dict()
-        for userid_0 in user_common_cnt.keys():
+        for cnt, userid_0 in enumerate(user_common_cnt.keys()):
+            if cnt%10000 == 0:
+                print("cnt: {}, userid: {}", cnt, userid)
             user_sim_dict.setdefault(userid_0, dict())
             for userid_1, common_cnt in user_common_cnt[userid_0].items():
                 user_sim_dict[userid_0].setdefault(userid_1, 0)
