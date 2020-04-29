@@ -59,7 +59,7 @@ class TagBasedRec:
                 if line.strip().startswith("userID"):
                     continue
                 userID, artistID, tagID = line.strip().split("\t")[:3]
-                artistID[tagID] = 1
+                artistTagRelationDict[tagID] = 1
                 userTagCntDict.setdefault(userID, dict())
                 userTagCntDict[userID][tagID] = userTagCntDict[userID].get(tagID, 0) + 1
                 tagCntDict[tagID] = tagCntDict.get(tagID, 0) + 1
@@ -71,7 +71,9 @@ class TagBasedRec:
     # 5. IDF计算：lg(所有用户对所有标签的次数/(所有用户对标签t的次数+1))
     # 标签t->cnt
     def getUserTagRateDict(self):
+        userTagRateDict = dict()
         for userID in self.userTagCntDict.keys():
+            userTagRateDict.setdefault(userID, dict())
             for tagId in self.tagCntDict.keys():
                 tf = self.userTagCntDict[tagId]/sum(self.userTagCntDict[userID].values())
                 idf = math.log(sum(self.tagCntDict.values())/(self.tagCntDict[tagId] + 1))
@@ -85,8 +87,15 @@ class TagBasedRec:
                 # 加入平滑因子
                 nominator += self.K * sum(self.userArtistRateDict[userID].values()) \
                              / len(self.userArtistRateDict[userID].values())
+                rate = nominator / denominator
+                userTagRateDict[userID][tagId] = rate * tfIdf
+        return userTagRateDict
 
 
 
-        pass
+
+
+
+
+
 
