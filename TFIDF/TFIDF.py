@@ -14,10 +14,10 @@ class TFTDF:
     def __init__(self):
         self.id_title = pd.read_csv(ID_TITILE_PATH, header=None, names=["id","title"], sep="\t", encoding="utf-8")
         self.stop_words = self.loadStopWords(STOP_WORDS_PATH)
-        self.wordsNums = 0 # 总词数
         self.docNums = self.id_title.size() # 总文档数
         self.termFreqDict = dict() # word -> 词频
         self.wordDocSetDict = dict() # word -> 文档set
+        self.docidWordsDict = dict() # docid -> 切好的词list
 
     def loadStopWords(self, filePath):
         stop_words = set()
@@ -32,20 +32,27 @@ class TFTDF:
         for _tup in self.id_title.itertuples():
             docid = _tup['id']
             title = _tup['title']
-            words = jieba.cut(title.strip())
+            words = jieba.cut(title.strip(), cut_all=False)
+            self.docidWordsDict.setdefault(docid, [])
             for word in words:
                 if word in self.stop_words:
                     continue
-                self.wordsNums += 1
-                self.termFreqDict[word] = self.termFreqDict.get(word, 0) + 1
+                self.docidWordsDict[docid].append(word)
                 self.wordDocSetDict.setdefault(word, set())
                 self.wordDocSetDict[word].add(docid)
 
+    def getTermFreq(self, word, words):
+        cnt = 0
+        for w in words:
+            if w == word:
+                cnt += 1
+        return cnt / len(words)
 
-    def calculateTFIDF(self, word):
-        tf = self.termFreqDict.get(word, 0) / self.wordsNums
+
+    def calculateTFIDF(self, word, words):
+        tf = self.getTermFreq(word, words)
         wordDocNums = len(self.wordDocSetDict.get(word)) if word in self.wordDocSetDict else 0
-        idf = math.log10(self.docNums/(1 + wordDocNums))
+        idf = math.log(self.docNums/(1 + wordDocNums))
         return tf * idf
 
 if __name__ == '__main__':
