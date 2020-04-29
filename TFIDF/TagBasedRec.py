@@ -13,7 +13,8 @@ USER_Artist_TAG_DAT_PATH = "data/lastfm-2k/user_taggedartists-timestamps.dat"
 ARTISTS_DAT_PATH = "data/lastfm-2k/artists.dat"
 
 class TagBasedRec:
-    def __init__(self):
+    def __init__(self, K):
+        self.K = K # 平滑因子
         self.allArtistIDsList = self.getAllArtistIDs()
         # 1. 用户u对艺术家i的打分（听的次数）TFIDF/data/lastfm-2k/user_artists.dat
         self.userArtistRateDict = self.getUserArtistRateDict()
@@ -82,7 +83,9 @@ class TagBasedRec:
                                  * self.artistTagRelationDict[artistID].get(tagId, 0)
                     denominator += self.artistTagRelationDict[artistID].get(tagId, 0)
                 # 加入平滑因子
-                nominator +=
+                nominator += self.K * sum(self.userArtistRateDict[userID].values()) \
+                             / len(self.userArtistRateDict[userID].values())
+
 
 
         pass
