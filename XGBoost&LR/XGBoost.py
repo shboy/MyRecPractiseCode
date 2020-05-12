@@ -128,4 +128,19 @@ class ChurnPredWithGBDT:
         x_columns = [x for x in self.train.columns if x not in [label, ID]]
         x_test = self.train[x_columns]
         y_test = self.train[label]
+        y_pred = gbdt.predict_proba(x_test)
+        new_y_pred = list()
+        for y in y_pred:
+            new_y_pred.append(1 if y[1] > 0.5 else 0)
+        mse = mean_squared_error(y_test, new_y_pred)
+        print("MSE: %.4f" % mse)
+        accuracy = metrics.accuracy_score(y_test.values, new_y_pred)
+        print("Accuracy : %.4g" % accuracy)
+        auc = metrics.roc_auc_score(y_test.values, new_y_pred)
+        print("AUC Score : %.4g" % auc)
+
+if __name__ == '__main__':
+    pred = ChurnPredWithGBDT()
+    gbdt = pred.train_model()
+    pred.evaluate(gbdt)
 
