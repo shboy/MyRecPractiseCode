@@ -13,7 +13,8 @@ import pandas as pd
 class LR:
     def __init__(self):
         self.file = "data/new_churn.csv"
-        pass
+        self.data = self.load_data()
+        self.train, self.test = self.split()
 
     def load_data(self):
         data = pd.read_csv(self.file)
@@ -26,8 +27,8 @@ class LR:
 
         fw = open("data/one_hot_churn.csv", "w")
         fw.write("customerID,")
-        # 47 ?
-        for i in range(1, 47): fw.write("f_%s" % i)
+        # 特征为一 47维向量
+        for i in range(1, 47): fw.write("f_%s," % i)
         fw.write("Churn\n")
         for line in data.values:
             list_line = list(line)
@@ -40,6 +41,8 @@ class LR:
                     ind = fDict[labels[i]].index(list_line[i])
                     arr[ind] = 1
                     for one in arr: list_result.append(one)
+                len01 = len(list_result)
+                pass
             fw.write(",".join([str(f) for f in list_result]) + "\n")
         fw.close()
         return pd.read_csv("data/one_hot_churn.csv")
@@ -56,8 +59,8 @@ class LR:
     def train_model(self):
         print("Start Train Model ... ")
         label = "Churn"
-        ID = "CustomerID"
-        x_columns = [x for x in self.train.columns if x not in [lable, ID]]
+        ID = "customerID"
+        x_columns = [x for x in self.train.columns if x not in [label, ID]]
         x_train = self.train[x_columns]
         y_train = self.train[label]
         # 定义模型
@@ -66,11 +69,11 @@ class LR:
         return lr
 
     def evaluate(self, lr, type):
-        lable = "Churn"
+        label = "Churn"
         ID = "customerID"
-        x_columns = [x for x in self.test.columns if x not in [lable, ID]]
+        x_columns = [x for x in self.test.columns if x not in [label, ID]]
         x_test = self.test[x_columns]
-        y_test = self.test[lable]
+        y_test = self.test[label]
         if type == 1:
             y_pred = lr.predict(x_test)
             new_y_pred = y_pred
