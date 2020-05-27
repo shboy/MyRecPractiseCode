@@ -49,7 +49,8 @@ def display_outlier(pd, feature):
 def display_distrib(pd, feature):
     plt.figure()
     sns.distplot(pd[feature].dropna() , fit=norm);
-    (mu, sigma) = norm.fit(pd[feature].dropna())    
+    # sns.distplot(pd[feature].dropna() , kde=False);
+    (mu, sigma) = norm.fit(pd[feature].dropna())
     
     plt.legend(['Normal dist. ($\mu=$ {:.2f} and $\sigma=$ {:.2f} )'.format(mu, sigma)], loc='best')
     plt.ylabel('Frequency')
